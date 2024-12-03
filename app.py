@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 import pandas as pd
 import plotly
 import plotly.express as px
@@ -33,9 +33,49 @@ def home():
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return render_template('index.html', graphJSON=graphJSON)
 
-@app.route('/chart/<int:chart_id>')
-def chart(chart_id):
-    return render_template('chart1.html')
+# - - - ÁBRÁK PAGE - - -
+def factor_name(factor):
+    factor_map = {
+        "Sex": "Nem",
+        "Age": "Kor",
+        "Pclass": "Osztály",
+        "Embarked": "Beszállási Hely",
+        "SibSp": "Testvérek és Házastársak száma",
+        "Parch": "Szülők és Gyerekek száma"
+    }
+    return factor_map.get(factor, factor)
+
+# Chart1 - Bar Chart
+@app.route('/chart1')
+def chart1():
+    factor = 'Sex'
+    grouped = df.groupby([factor, 'Survived']).size().reset_index(name='Count')
+
+    bar_fig = px.bar(
+        grouped, x=factor, y='Count', color='Survived',
+        barmode='group',
+        labels={'Survived': 'Túlélés'},
+        title=f"Túlélési arány {factor_name(factor)} szerint"
+    )
+
+    bar_json = json.dumps(bar_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return render_template('chart1.html', graphJSON=bar_json)
+
+@app.route('/update_chart1')
+def update_chart1():
+    factor = request.args.get('factor', 'Sex')
+    grouped = df.groupby([factor, 'Survived']).size().reset_index(name='Count')
+
+    bar_fig = px.bar(
+        grouped, x=factor, y='Count', color='Survived',
+        barmode='group',
+        labels={'Survived': 'Túlélés'},
+        title=f"Túlélési arány {factor_name(factor)} szerint"
+    )
+
+    response = {'bar_chart': json.dumps(bar_fig, cls=plotly.utils.PlotlyJSONEncoder)}
+    return jsonify(response)
+
 
 @app.route('/statistics')
 def statistics():

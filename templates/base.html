@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Alapértelmezett Cím{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.3.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </head>
@@ -56,8 +55,9 @@ body {
     <!-- Bal oldali navigációs sáv -->
     <div class="sidebar">
         <a href="{{ url_for('home') }}">Kezdőlap</a>
-        <a href="{{ url_for('chart', chart_id=1) }}">Interaktív Korrelációs Ábrák</a>
         <a href="{{ url_for('statistics') }}">Statisztikák</a>
+        <a href="{{ url_for('chart1') }}">Interaktív Korrelációs Ábrák</a>
+
     </div>
 
     <!-- Dinamikus tartalmi rész -->

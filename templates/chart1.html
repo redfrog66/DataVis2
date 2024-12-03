@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Általános túlélési ábra</h1>
+    
+    <label for="factor-picker">Válassz egy tényezőt (X-tengely):</label>
+    <select id="factor-picker">
+        <option value="Sex">Nem</option>
+        <option value="Pclass">Osztály</option>
+        <option value="Age">Kor</option>
+        <option value="SibSp">Testvérek és/vagy házastársak száma</option>
+        <option value="Parch">Szülők/gyermekek száma</option>
+        <option value="Embarked">Származás</option>
+    </select>
+
+    <!-- Bar chart helye -->
+    <div id="correlation-chart" style="width: 100%; height: 400px;"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    // Alapértelmezett diagramok betöltése
+    const initialData = JSON.parse('{{ graphJSON|tojson }}');
+
+    // Bar chart kezdeti betöltése
+    Plotly.newPlot('correlation-chart', initialData.data, initialData.layout);
+
+    // Dropdown menü kezelése
+    function updateCharts() {
+        const factor = $('#factor-picker').val();  // X-tengely kiválasztása
+
+        // Adatok lekérése a szervertől
+        $.get('/update_chart1', { factor: factor }, function(response) {
+            const newBar = JSON.parse(response.bar_chart);
+            Plotly.react('correlation-chart', newBar.data, newBar.layout);
+        }).fail(function(error) {
+            console.error('Hiba történt:', error);
+        });
+
+    }
+
+    // Dropdown menük eseménykezelése
+    $('#factor-picker').change(updateCharts);
+</script>
+{% endblock %}
