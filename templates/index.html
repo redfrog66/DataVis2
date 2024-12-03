@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Kezdőlap{% endblock %}
+
+{% block content %}
+<h1>Adatvizualizáció a Titanic túlélőinek adatai alapján</h1>
+
+<section>
+    <p>A cél, hogy összefüggéseket prezentáljunk egy katasztrófa túlélőinek rögzített adataiból. Ezáltal választ kapunk arra, hogy a katasztrófa túlélésében milyen szerepet játszik az illető neme, kora, stb.</p>
+</section>
+
+<section>
+    <p>892 fő adataival rendelkezünk, mind a Titanic hajóbaleset elszenvedői.</p>
+</section>
+
+<section>
+    <h2>A projekt során vizsgált tényezők:</h2>
+    <ul>
+        <li>Nem (sex)</li>
+        <li>Kor (age)</li>
+        <li>Osztály (pclass)</li>
+        <li>Hány fővel utazott együtt? (sibsp / parch)</li>
+        <li>Mely kabinban tartózkodott? (cabin)</li>
+        <li>Honnan származott? (embarked)</li>
+    </ul>
+</section>
+
+<section>
+    <p>A cél az, hogy megállapítsuk és szemmel láthatóan prezentáljuk, hogy mely tényezők befolyásolják a túlélési esélyeket.</p>
+    <p>Ezek után szeretnénk összevetni a vizsgált tényezőket a túlélési esélyekkel, és megállapítani, hogy melyik tényezőnek van a legnagyobb hatása a túlélési esélyekre.</p>
+</section>
+
+<div>
+    <p>A túlélők és elhunytak arányát az alábbi interaktív diagram mutatja:</p>
+    <div id="piechart"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const graphJSON = JSON.parse(`{{ graphJSON|safe }}`);
+    Plotly.newPlot('piechart', graphJSON.data, graphJSON.layout, {displayModeBar: false});
+</script>
+{% endblock %}
+
+

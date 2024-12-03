@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Alapértelmezett Cím{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.3.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
+    
+<style>
+    /* Oldal alap stílusai */
+body {
+    display: flex;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    height: 100vh;
+    background-color: #c0dee5; /* Világoskék háttér a teljes oldalhoz */
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #07575B; /* Kékeszöld háttérszín a sidebarhoz */
+    padding-top: 20px;
+    padding-right: 10px;
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+    margin: 5px 0;
+    background-color: #003B46; /* Sötétebb kékeszöld a gombokhoz */
+    border-radius: 5px;
+    transition: background-color 0.3s ease; /* Sima animáció a színváltáshoz */
+}
+
+.sidebar a:hover {
+    background-color: #61A4AD; /* Világosabb kékeszöld a hover állapothoz */
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f4f4f4; /* Világosszürke tartalmi terület */
+}
+</style>
+<body>
+    <!-- Bal oldali navigációs sáv -->
+    <div class="sidebar">
+        <a href="{{ url_for('home') }}">Kezdőlap</a>
+        <a href="{{ url_for('chart', chart_id=1) }}">Interaktív Korrelációs Ábrák</a>
+        <a href="{{ url_for('statistics') }}">Statisztikák</a>
+    </div>
+
+    <!-- Dinamikus tartalmi rész -->
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+</html>
