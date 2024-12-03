@@ -76,10 +76,68 @@ def update_chart1():
     response = {'bar_chart': json.dumps(bar_fig, cls=plotly.utils.PlotlyJSONEncoder)}
     return jsonify(response)
 
+def format_age(age):
+    if age >= 1:
+        return f"{int(age)} éves"
+    else:
+        months = round(age * 12)
+        return f"{months} hónapos"
+    
+def get_port_name(code):
+    port_names = {
+        'C': 'Cherbourg',
+        'Q': 'Queenstown',
+        'S': 'Southampton'
+    }
+    return port_names.get(code, 'Ismeretlen kikötő')
+
 
 @app.route('/statistics')
 def statistics():
-    return render_template('statistics.html')
+    # Legidősebb utas
+    oldest_passenger = df.loc[df['Age'].idxmax()]
+    youngest_passenger = df.loc[df['Age'].idxmin()]
+    
+    # Kikötő statisztika
+    most_common_embarked = df['Embarked'].value_counts().idxmax()
+    embarked_count = df['Embarked'].value_counts().max()
+    most_common_embarked_name = get_port_name(most_common_embarked)  # Kikötő nevének meghatározása
+    
+    # Osztály statisztika
+    most_common_class = df['Pclass'].value_counts().idxmax()
+    class_count = df['Pclass'].value_counts().max()
+    
+    # Legdrágább jegy
+    most_expensive_ticket = df.loc[df['Fare'].idxmax()]
+    
+    # Adatok formázása
+    statistics = {
+        'oldest_passenger': {
+            'name': oldest_passenger['Name'],
+            'age': format_age(oldest_passenger['Age']),
+        },
+        'youngest_passenger': {
+            'name': youngest_passenger['Name'],
+            'age': format_age(youngest_passenger['Age']),
+        },
+        'most_common_embarked': {
+            'port': most_common_embarked_name,
+            'count': embarked_count,
+        },
+        'most_common_class': {
+            'class': most_common_class,
+            'count': class_count,
+        },
+        'most_expensive_ticket': {
+            'name': most_expensive_ticket['Name'],
+            'fare': f"{most_expensive_ticket['Fare']:.2f}",
+            'class': most_expensive_ticket['Pclass'],
+        }
+    }
+
+    return render_template('statistics.html', statistics=statistics)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
