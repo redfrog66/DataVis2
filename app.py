@@ -137,6 +137,30 @@ def statistics():
 
     return render_template('statistics.html', statistics=statistics)
 
+@app.route('/tree1')
+def tree1():
+    # Alapértelmezett tényezők és csoportosítás
+    grouped = df.groupby(['Survived', 'Sex', 'Pclass']).size().reset_index(name='Count')
+
+    # Treemap létrehozása
+    tree_fig = px.treemap(
+        grouped,
+        path=['Survived', 'Sex', 'Pclass'],  # Hierarchikus bontás
+        values='Count',  # Téglalap méretét befolyásoló adat
+        color='Count',  # Színezés a Count értékek alapján
+        color_continuous_scale='Blues',  # Színskála
+        title="Titanic túlélési arány hierarchikus bontásban"
+    )
+
+    # JSON konvertálás
+    tree_json = json.dumps(tree_fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    # Ellenőrzés, hogy mi kerül a treeJSON-ba
+    app.logger.debug("Tree JSON: %s", tree_json)
+
+    # Renderelés
+    return render_template('tree1.html', treeJSON=tree_json)
+
 
 
 if __name__ == '__main__':
