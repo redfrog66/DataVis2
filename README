@@ -1,0 +1,27 @@
+    A cél, hogy összefüggéseket prezentáljunk egy katasztrófa tűlélőinek rögzített adataiból. Ezáltal választ kapunk arra, hogy a katasztrófa túlélésében milyen szerepet játszik
+az illető neme, kora, stb. 892 fő adataival rendelkezünk, mind a Titanic hajóbaleset elszenvedői.
+A projekt során a következő tényezőket vizsgáljuk:
+- Nem (sex)
+- Kor (age)
+- Osztály (pclass)
+- Hány fővel utazott együtt? (sibsp / parch)
+- Mely kabinban tartózkodott? (cabin)
+- Honnan származott? (embarked)
+A cél az, hogy megállapítsuk és szemmel láthatóan prezentáljuk, hogy mely tényezők befolyásolják a túlélési esélyeket.
+Ezek után szeretnénk összevetni a vizsgált tényezőket a túlélési esélyekkel, és megállapítani, hogy melyik tényezőnek van a legnagyobb hatása a túlélési esélyekre.
+
+Adatvizualizációs tárgy során a fő szempont a prezentálás megvalósítása. A projekt következő szinre emelésére jó gondolat egy modell betanítása, amely képes megjósolni, 
+hogy egy adott személy túlélte-e a katasztrófát vagy sem.
+
+Színpaletta:
+Felület:
+#C0DEE5
+#61A4AD
+#07575B
+#003B46
+
+## TODO:
+- Scatterplot helyett "szinezős genyó"
+- Mr/Mrs/Miss/Dr stb. kategóriák
+- heatmap helyett simán 1-0 értékek
+- hoverkor 0 és 1 helyett "Survived" és "Died"
