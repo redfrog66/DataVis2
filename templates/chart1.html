@@ -24,7 +24,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
     // Alapértelmezett diagramok betöltése
-    const initialData = JSON.parse('{{ graphJSON|tojson }}');
+    const initialData = JSON.parse('{{ graphJSON|safe }}');
 
     // Bar chart kezdeti betöltése
     Plotly.newPlot('correlation-chart', initialData.data, initialData.layout);

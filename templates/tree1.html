@@ -11,7 +11,7 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
     // Ellenőrizzük, hogy a treeJSON változó megfelelő JSON adatot tartalmaz-e
-    const treeData = JSON.parse('{{ treeJSON | tojson }}');
+    const treeData = JSON.parse('{{ treeJSON | safe }}');
 
     // Ellenőrzés a konzolban
     console.log(treeData);
