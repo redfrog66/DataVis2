@@ -1,28 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Sunburst Diagramok{% endblock %}
+{% block title %}Sunburst Ábra{% endblock %}
 
 {% block content %}
-<h1>Sunburst Ábra</h1>
+<h1>Titanic Sunburst Ábrák</h1>
 
-<!-- Sunburst 1 -->
-<div id="sunburst1" style="height: 600px;"></div>
+<!-- Sunburst 1 Ábra -->
+<div id="sunburst1"></div>
 
-<!-- Sunburst 2 -->
-<div id="sunburst2" style="height: 600px;"></div>
+<!-- Sunburst 2 Ábra -->
+<div id="sunburst2"></div>
 
-{% endblock %}
-
-{% block scripts %}
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <script>
-    // Sunburst 1: Túlélési arány nem és jegytípus szerint
-    var sunburstData1 = "{{ sunburstJSON | safe }}";
-    Plotly.newPlot('sunburst1', sunburstData1);
+    // Az első Sunburst ábra renderelése
+    var sunburstData1 = {{ sunburst_json | safe }};
+    Plotly.newPlot('sunburst1', sunburstData1.data, sunburstData1.layout);
 
-    // Sunburst 2: Teljes utaslista hierarchikus bontásban
-    var sunburstData2 = "{{ sunburst2JSON | safe }}";
-    Plotly.newPlot('sunburst2', sunburstData2);
+    // A második Sunburst ábra renderelése
+    var sunburstData2 = {{ sunburst2_json | safe }};
+    Plotly.newPlot('sunburst2', sunburstData2.data, sunburstData2.layout);
 </script>
+
 {% endblock %}

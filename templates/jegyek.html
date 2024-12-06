@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Jegyek Ábra{% endblock %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% block content %}
+<h1>Jegyárak és Eladott Jegyek</h1>
+<div>
+    <!-- Ábra beágyazása -->
+    {{ graph_html|safe }}
+</div>
+<div>
+    {{ graph2_html|safe }}
+</div>
+
+{% endblock %}
