@@ -51,10 +51,20 @@ def chart1():
     factor = 'Sex'
     grouped = df.groupby([factor, 'Survived']).size().reset_index(name='Count')
 
+    # 'Survived' oszlop átalakítása szöveges adattípussá
+    grouped['Survived'] = grouped['Survived'].astype(str)
+
+    # Oszlop színek beállítása
+    color_discrete_map = {
+    '0': 'yellow',  # Nem túlélők színe
+    '1': 'blue'     # Túlélők színe
+    }
+
     bar_fig = px.bar(
         grouped, x=factor, y='Count', color='Survived',
         barmode='group',
         labels={'Survived': 'Túlélés'},
+        color_discrete_map={0: 'red', 1: 'blue'},
         title=f"Túlélési arány {factor_name(factor)} szerint"
     )
 
@@ -66,10 +76,20 @@ def update_chart1():
     factor = request.args.get('factor', 'Sex')
     grouped = df.groupby([factor, 'Survived']).size().reset_index(name='Count')
 
+    # 'Survived' oszlop átalakítása szöveges adattípussá
+    grouped['Survived'] = grouped['Survived'].astype(str)
+
+    # Oszlop színek beállítása
+    color_discrete_map = {
+    '0': 'yellow',  # Nem túlélők színe
+    '1': 'blue'     # Túlélők színe
+    }
+
     bar_fig = px.bar(
         grouped, x=factor, y='Count', color='Survived',
         barmode='group',
         labels={'Survived': 'Túlélés'},
+        color_discrete_map={0: 'red', 1: 'blue'},
         title=f"Túlélési arány {factor_name(factor)} szerint"
     )
 
@@ -139,7 +159,7 @@ def statistics():
 
 @app.route('/tree1')
 def tree1():
-    # ---- Treemap 1: Túlélési arány nem és jegytípus szerint ----
+    # ---- Treemap: Túlélési arány nem és jegytípus szerint ----
     # Alapértelmezett tényezők és csoportosítás
     grouped = df.groupby(['Survived', 'Sex', 'Pclass']).size().reset_index(name='Count')
 
@@ -149,10 +169,10 @@ def tree1():
         1: 'Túlélt'
     })
 
-    # 'Sex' értékek lecserélése magyar kifejezésekre
-    grouped['Sex'] = grouped['Sex'].replace({
-        'male': 'Férfi',
-        'female': 'Nő'
+    # Egyedi színértékek hozzárendelése túlélési státusz szerint
+    grouped['Color'] = grouped['Survived'].replace({
+        'Elhunyt': 'blue',
+        'Túlélt': 'green'
     })
 
     # Treemap létrehozása
@@ -161,7 +181,7 @@ def tree1():
         path=['Survived', 'Sex', 'Pclass'],  # Hierarchikus bontás
         values='Count',  # Téglalap méretét befolyásoló adat
         color='Count',  # Színezés a Count értékek alapján
-        color_continuous_scale='Blues',  # Színskála
+        color_continuous_scale='Viridis',  # Alapértelmezett színskála
         title="Titanic túlélési arány hierarchikus bontásban túlélés, nem és jegytípus alapján"
     )
 
@@ -174,6 +194,7 @@ def tree1():
         )
     )
 
+
     # JSON konvertálás
     tree_json = json.dumps(tree_fig, cls=plotly.utils.PlotlyJSONEncoder)
 
@@ -181,8 +202,8 @@ def tree1():
     df['Age'] = df['Age'].fillna(-1)  # Ha van NaN, akkor -1-el pótoljuk
     df['AgeCategory'] = pd.cut(
         df['Age'], 
-        bins=[-1, 10, 25, 40, 50, 120],  # -1 biztosítja, hogy a 0 alatti korok is megfelelően bekerüljenek
-        labels=['<10 éves', '10-25', '25-40', '40-50', '50+'],
+        bins=[-1, 10, 25, 40, 55, 120],  # -1 biztosítja, hogy a 0 alatti korok is megfelelően bekerüljenek
+        labels=['<10 éves', '10-25', '25-40', '40-55', '55+'],
         right=False  # Az alsó határ kizárásával biztosítjuk, hogy -1 < 10 a kategóriában legyen
     )
 
@@ -299,6 +320,9 @@ def jegyek():
     # Csoportosítás az 'Fare' és 'Pclass' oszlopok alapján
     grouped_data = df.groupby(['Fare', 'Pclass']).size().reset_index(name='Eladott jegyek')
 
+    # 'Pclass' oszlop átalakítása szöveges adattípussá
+    grouped_data['Pclass'] = grouped_data['Pclass'].astype(str)
+
     # Megkeressük a legdrágább jegyet
     max_fare = df['Fare'].max()  # A legdrágább jegy ára
     max_fare_tickets = df[df['Fare'] == max_fare]  # Minden jegy, ami a legdrágább
@@ -343,13 +367,14 @@ def jegyek():
     # Az ábra HTML formátumban történő átadása
     graph_html = fig.to_html(full_html=False)
 
-    # Név előtagok és színek kinyerése
+        # Név előtagok kinyerése
     df['Title'] = df['Name'].apply(lambda x: x.split(',')[1].split('.')[0].strip())
-    # Női és férfi előtagok listája
 
+    # Női és férfi előtagok listája
     female_titles = ['Mrs', 'Miss', 'Mme', 'Ms', 'Mlle', 'Lady', 'the Countess']
     male_titles = ['Mr', 'Master', 'Don', 'Rev', 'Major', 'Sir', 'Col', 'Capt', 'Jonkheer']
 
+    # GenderColor hozzárendelése
     def assign_gender_color(title):
         if title in female_titles:
             return 'pink'  # női
@@ -360,26 +385,38 @@ def jegyek():
 
     df['GenderColor'] = df['Title'].apply(assign_gender_color)
 
-    # Ábra létrehozása a név előtagok alapján, abc sorrendben
+    # Ár kategóriák létrehozása
+    bins = [0, 10, 50, 100, 150, 200, 250, 300, float('inf')]
+    labels = ['<$10', '$10-$50', '$50-$100', '$100-$150', '$150-$200', '$200-$250', '$250-$300', '>$300']
+    df['FareCategory'] = pd.cut(df['Fare'], bins=bins, labels=labels, right=False)
+
+    # Jegyek számának összesítése kategóriánként
+    category_counts = df.groupby(['Title', 'FareCategory']).size().reset_index(name='TicketCount')
+
+    # GenderColor hozzáadása a category_counts DataFrame-hez
+    category_counts = category_counts.merge(df[['Title', 'GenderColor']].drop_duplicates(), on='Title', how='left')
+
+    # Ábra létrehozása
     fig2 = px.scatter(
-        df,
+        category_counts,
         x='Title',
-        y='Fare',
-        color='GenderColor',
-        size='Fare',  # A körök mérete az eladott jegyek számától függhet
-        color_discrete_map={
-            'pink': 'pink',  # Női előtag: rózsaszín
-            'blue': 'blue',  # Férfi előtag: kék
-            'orange': 'orange'  # Vegyes nemek aránya: narancssárga
+        y='FareCategory',
+        size='TicketCount',  # Kör mérete a jegyek számától függ
+        color='GenderColor',  # Színezés a GenderColor alapján
+        color_discrete_map={  # Színkódok hozzárendelése
+            'pink': 'pink',  # női előtag
+            'blue': 'blue',  # férfi előtag
+            'orange': 'orange'  # vegyes nemek aránya
         },
-        title="Jegyárak és Eladott Jegyek név-előtagok szerint",
-        labels={'Fare': 'Jegy Ár', 'Title': 'Előtag'},
-        template="plotly_dark",
-        category_orders={
-            'Title': sorted(df['Title'].unique())  # Az 'Title' értékek abc sorrendbe rendezése
-        }
+        title="Jegyárak kategóriánként és eladott jegyek név-előtagok szerint",
+        labels={'FareCategory': 'Árkategória', 'Title': 'Előtag', 'TicketCount': 'Jegyek száma'},
+        template="plotly_dark"
     )
 
+    fig2.update_layout(
+        yaxis_categoryorder='array',  # Ár kategóriák sorrendjének beállítása
+        yaxis_categoryarray=labels
+    )
 
     # Ábrák HTML formátumban történő átadása
     graph2_html = fig2.to_html(full_html=False)
